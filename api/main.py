@@ -10,27 +10,35 @@ from api.schemas import (
 )
 from src.models.predict_model import DelayPredictor
 
-app = FastAPI(
-    title="Assignment Submission Delay Prediction API",
-    description="MLOps microservice forecasting student assignment submission lateness.",
-    version="1.0.0"
-)
+from contextlib import asynccontextmanager
 
 # Global predictor instance
 predictor = None
 
 
-@app.on_event("startup")
-def load_model():
+def get_predictor() -> DelayPredictor:
     global predictor
-    model_path = os.path.join("models", "model.joblib")
-    if os.path.exists(model_path):
+    if predictor is None:
+        model_path = os.path.join("models", "model.joblib")
+        if not os.path.exists(model_path):
+            from src.models.train_model import train
+            train(model_type="xgboost")
         predictor = DelayPredictor(model_path=model_path)
-    else:
-        # Train lightweight model if not existing
-        from src.models.train_model import train
-        train(model_type="xgboost")
-        predictor = DelayPredictor(model_path=model_path)
+    return predictor
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    get_predictor()
+    yield
+
+
+app = FastAPI(
+    title="Assignment Submission Delay Prediction API",
+    description="MLOps microservice forecasting student assignment submission lateness.",
+    version="1.0.0",
+    lifespan=lifespan
+)
 
 
 @app.get("/")
@@ -45,29 +53,27 @@ def root():
 
 @app.get("/health")
 def healthcheck():
+    pred = get_predictor()
     return {
         "status": "healthy",
-        "model_loaded": predictor is not None
+        "model_loaded": pred is not None
     }
 
 
 @app.post("/predict", response_model=PredictionResponse)
 def predict_single(data: StudentFeaturesInput):
-    if predictor is None:
-        raise HTTPException(status_code=503, detail="Model is not loaded.")
-    
+    pred = get_predictor()
     input_dict = data.model_dump()
     student_id = input_dict.pop("student_id", "STU_UNKNOWN")
     
-    res = predictor.predict_single(input_dict)
+    res = pred.predict_single(input_dict)
     res["student_id"] = student_id
     return res
 
 
 @app.post("/batch_predict", response_model=BatchPredictionResponse)
 def predict_batch(batch: BatchPredictionRequest):
-    if predictor is None:
-        raise HTTPException(status_code=503, detail="Model is not loaded.")
+    pred = get_predictor()
         
     records = [s.model_dump() for s in batch.students]
     df = pd.DataFrame(records)

@@ -99,7 +99,14 @@ def train(model_type: str = "xgboost"):
         joblib.dump(full_pipeline, model_path)
         
         # Log model with MLflow
-        mlflow.sklearn.log_model(full_pipeline, "model")
+        try:
+            mlflow.sklearn.log_model(
+                full_pipeline,
+                name="model",
+                serialization_format="pickle"
+            )
+        except Exception:
+            mlflow.log_artifact(model_path, artifact_path="model")
         print(f"Model successfully saved to {model_path} and logged to MLflow.")
         
     return full_pipeline
