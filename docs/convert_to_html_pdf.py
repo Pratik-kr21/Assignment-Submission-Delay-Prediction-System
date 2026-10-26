@@ -122,11 +122,13 @@ CSS_STYLES = """
 """
 
 
-def convert():
-    with open(MD_PATH, "r", encoding="utf-8") as f:
+def convert_doc(md_path: str, html_path: str, title: str, subtitle: str, deliverable: str):
+    if not os.path.exists(md_path):
+        return
+        
+    with open(md_path, "r", encoding="utf-8") as f:
         md_text = f.read()
 
-    # Pre-process mermaid code blocks for rendering
     lines = md_text.splitlines()
     processed_lines = []
     in_mermaid = False
@@ -153,26 +155,43 @@ def convert():
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Mini Project Phase 1–2: Project Proposal & System Design Document</title>
+    <title>{title}</title>
     {CSS_STYLES}
 </head>
 <body>
     <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF (Ctrl + P)</button>
     <div class="cover-box">
-        <div class="cover-title">🎓 EduPredict-MLOps</div>
-        <div class="cover-subtitle">Assignment Submission Delay Prediction System</div>
+        <div class="cover-title">🎓 {title}</div>
+        <div class="cover-subtitle">{subtitle}</div>
         <p><strong>Course:</strong> Machine Learning Operations (MLOps) Mini Project</p>
-        <p><strong>Deliverable:</strong> Phase 1–2: Project Proposal & System Design Document</p>
+        <p><strong>Deliverable:</strong> {deliverable}</p>
     </div>
     {html_body}
 </body>
 </html>
 """
 
-    with open(HTML_PATH, "w", encoding="utf-8") as f:
+    with open(html_path, "w", encoding="utf-8") as f:
         f.write(full_html)
-    print(f"Successfully generated print-ready document at {HTML_PATH}")
+    print(f"Successfully generated print-ready document at {html_path}")
+
+
+def main():
+    convert_doc(
+        md_path=os.path.join("docs", "Phase1_2_Project_Proposal_and_System_Design.md"),
+        html_path=os.path.join("docs", "Phase1_2_Project_Proposal_and_System_Design.html"),
+        title="EduPredict-MLOps: Proposal & Design",
+        subtitle="Assignment Submission Delay Prediction System",
+        deliverable="Phase 1–2: Project Proposal & System Design Document"
+    )
+    convert_doc(
+        md_path=os.path.join("docs", "Phase3_4_Testing_and_Progress_Report.md"),
+        html_path=os.path.join("docs", "Phase3_4_Testing_and_Progress_Report.html"),
+        title="EduPredict-MLOps: Implementation & Testing",
+        subtitle="Assignment Submission Delay Prediction System",
+        deliverable="Phase 3–4: Working Prototype, Testing & Progress Report"
+    )
 
 
 if __name__ == "__main__":
-    convert()
+    main()

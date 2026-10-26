@@ -1,0 +1,35 @@
+stages:
+  prepare:
+    cmd: python -m src.data.make_dataset
+    deps:
+      - src/data/make_dataset.py
+    outs:
+      - data/raw/student_submission_data.csv:
+          cache: true
+
+  train:
+    cmd: python -m src.models.train_model
+    deps:
+      - src/models/train_model.py
+      - src/features/build_features.py
+      - data/raw/student_submission_data.csv
+    outs:
+      - models/model.joblib:
+          cache: true
+
+  evaluate:
+    cmd: python -m src.models.benchmark
+    deps:
+      - src/models/benchmark.py
+      - data/raw/student_submission_data.csv
+    outs:
+      - docs/figures/roc_curves.png:
+          cache: false
+      - docs/figures/confusion_matrices.png:
+          cache: false
+      - docs/figures/model_comparison.png:
+          cache: false
+      - docs/figures/feature_importance.png:
+          cache: false
+      - docs/metrics_summary.json:
+          cache: false

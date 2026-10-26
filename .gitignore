@@ -48,10 +48,13 @@ mlartifacts/
 # DVC local storage & cache
 .dvc/cache
 .dvc/tmp/
-/data/raw/*
-!/data/raw/.gitkeep
-/data/processed/*
-!/data/processed/.gitkeep
+!*.dvc
+!/data/**/.gitignore
+!/data/**/.gitkeep
+/data/raw/*.csv
+/data/raw/*.parquet
+/data/processed/*.csv
+/data/processed/*.parquet
 models/*.pkl
 models/*.joblib
 models/*.onnx

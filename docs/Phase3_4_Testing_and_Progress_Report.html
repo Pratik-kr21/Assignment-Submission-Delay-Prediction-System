@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>EduPredict-MLOps: Implementation & Testing</title>
+    
+<style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+    
+    body {
+        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        line-height: 1.6;
+        color: #1f2937;
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 40px 20px;
+    }
+    
+    h1 {
+        color: #1e3a8a;
+        border-bottom: 3px solid #3b82f6;
+        padding-bottom: 12px;
+        margin-top: 30px;
+        font-size: 26px;
+    }
+    h2 {
+        color: #1e40af;
+        border-bottom: 1px solid #e5e7eb;
+        padding-bottom: 8px;
+        margin-top: 25px;
+        font-size: 20px;
+    }
+    h3 {
+        color: #374151;
+        margin-top: 18px;
+        font-size: 16px;
+    }
+    
+    table {
+        width: 100%;
+        border-collapse: collapse;
+        margin: 20px 0;
+        font-size: 14px;
+    }
+    th, td {
+        border: 1px solid #d1d5db;
+        padding: 10px 14px;
+        text-align: left;
+    }
+    th {
+        background-color: #f3f4f6;
+        color: #111827;
+        font-weight: 600;
+    }
+    tr:nth-child(even) {
+        background-color: #f9fafb;
+    }
+    
+    pre {
+        background-color: #f8fafc;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        padding: 14px;
+        overflow-x: auto;
+        font-size: 13px;
+    }
+    code {
+        font-family: 'Consolas', 'Courier New', monospace;
+    }
+    
+    blockquote {
+        border-left: 4px solid #3b82f6;
+        background: #eff6ff;
+        padding: 10px 16px;
+        margin: 15px 0;
+        border-radius: 0 6px 6px 0;
+    }
+    
+    .cover-box {
+        text-align: center;
+        border: 2px solid #1e40af;
+        border-radius: 10px;
+        padding: 30px 20px;
+        margin-bottom: 40px;
+        background: linear-gradient(135deg, #f0f7ff 0%, #ffffff 100%);
+    }
+    .cover-title {
+        font-size: 28px;
+        font-weight: 700;
+        color: #1e3a8a;
+        margin-bottom: 10px;
+    }
+    .cover-subtitle {
+        font-size: 16px;
+        color: #4b5563;
+        margin-bottom: 20px;
+    }
+    .print-btn {
+        background-color: #2563eb;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-bottom: 20px;
+    }
+    
+    @media print {
+        .print-btn { display: none; }
+        body { padding: 0; max-width: 100%; }
+        h1, h2 { page-break-after: avoid; }
+        table, pre { page-break-inside: avoid; }
+    }
+</style>
+<script type="module">
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+    mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
+</script>
+
+</head>
+<body>
+    <button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF (Ctrl + P)</button>
+    <div class="cover-box">
+        <div class="cover-title">🎓 EduPredict-MLOps: Implementation & Testing</div>
+        <div class="cover-subtitle">Assignment Submission Delay Prediction System</div>
+        <p><strong>Course:</strong> Machine Learning Operations (MLOps) Mini Project</p>
+        <p><strong>Deliverable:</strong> Phase 3–4: Working Prototype, Testing & Progress Report</p>
+    </div>
+    <h1>Mini Project Phase 3–4: Implementation &amp; Testing Report</h1>
+<p><strong>Course</strong>: Machine Learning Operations (MLOps)<br />
+<strong>Project Title</strong>: Assignment Submission Delay Prediction System<br />
+<strong>Document</strong>: Phase 3–4 Deliverable (Working Prototype, Source Code, Testing &amp; Progress Report)<br />
+<strong>Repository</strong>: <a href="https://github.com/Pratik-kr21/Assignment-Submission-Delay-Prediction-System">github.com/Pratik-kr21/Assignment-Submission-Delay-Prediction-System</a><br />
+<strong>Date</strong>: October 2026  </p>
+<hr />
+<h2>1. Working Prototype &amp; System Modules</h2>
+<h3>1.1 Overview of Implemented Modules</h3>
+<p>The project has achieved a fully functional, container-ready prototype consisting of the following architectural modules:</p>
+<ol>
+<li><strong>Data Ingestion &amp; Synthesis Engine (<code>src/data/make_dataset.py</code>)</strong>:</li>
+<li>Simulates and models student interaction logs, course assignments, and submission deadlines mirroring the Open University Learning Analytics Dataset (OULAD) schema.</li>
+<li>Tracks raw CSV files via <strong>DVC</strong> (<code>student_submission_data.csv.dvc</code>).</li>
+<li><strong>Preprocessing &amp; Feature Pipeline (<code>src/features/build_features.py</code>)</strong>:</li>
+<li>Extracts historical punctuality indicators (Relative Assignment Submission Time - RAST, past delay averages).</li>
+<li>Calculates clickstream engagement velocity (<code>clicks_last_7_days</code>, <code>activity_decay_ratio</code>).</li>
+<li>Measures cognitive overload (<code>concurrent_deadlines_window</code>) and assessment context.</li>
+<li>Encapsulates transformations in a reusable Scikit-Learn <code>ColumnTransformer</code>.</li>
+<li><strong>Model Training &amp; Experimentation Pipeline (<code>src/models/train_model.py</code>)</strong>:</li>
+<li>Evaluates candidate classifiers: Logistic Regression, Random Forest, and XGBoost.</li>
+<li>Integrates automated <strong>MLflow Tracking</strong> to log hyperparameters, evaluation metrics, and model binaries.</li>
+<li><strong>FastAPI Inference Microservice (<code>api/main.py</code>)</strong>:</li>
+<li>Exposes asynchronous REST endpoints for single-student predictions (<code>POST /predict</code>), cohort screenings (<code>POST /batch_predict</code>), and system health checks (<code>GET /health</code>).</li>
+<li>Validates requests with strict <strong>Pydantic V2</strong> schemas (<code>api/schemas.py</code>).</li>
+<li><strong>Interactive Streamlit Web Dashboard (<code>frontend/app.py</code>)</strong>:</li>
+<li><strong>👩‍🏫 Instructor Early-Warning Portal</strong>: Displays cohort delay heatmaps, risk tier breakdowns, and auto-generates personalized intervention emails.</li>
+<li><strong>🎒 Student Self-Check Portal</strong>: Allows students to input upcoming workload and receive time-management action plans.</li>
+<li><strong>📊 MLOps Observability Portal</strong>: Features real-time Kolmogorov-Smirnov (KS-test) data drift detection to monitor semester transitions.</li>
+<li><strong>Container Orchestration (<code>Dockerfile</code>, <code>docker-compose.yml</code>)</strong>:</li>
+<li>Provides multi-service configuration connecting FastAPI, Streamlit, and the MLflow Tracking Server.</li>
+</ol>
+<hr />
+<h2>2. Source Code &amp; GitHub Repository</h2>
+<ul>
+<li><strong>Official Repository Link</strong>:<br />
+  👉 <a href="https://github.com/Pratik-kr21/Assignment-Submission-Delay-Prediction-System">https://github.com/Pratik-kr21/Assignment-Submission-Delay-Prediction-System</a></li>
+<li><strong>Branch</strong>: <code>main</code> (Continuous commit history maintained throughout development)</li>
+<li><strong>Configuration Files</strong>:</li>
+<li><a href="../config/config.yaml">config/config.yaml</a>: Centralized hyperparameters, feature lists, and server ports.</li>
+<li><a href="../requirements.txt">requirements.txt</a>: Exact dependency manifests.</li>
+<li><a href="../dvc.yaml">dvc.yaml</a>: Reproducible pipeline specification (<code>prepare</code>, <code>train</code>, <code>evaluate</code>).</li>
+<li><a href="../.github/workflows/ci.yml">.github/workflows/ci.yml</a>: Automated GitHub Actions Continuous Integration pipeline.</li>
+</ul>
+<hr />
+<h2>3. Testing, Performance Evaluation &amp; Results</h2>
+<h3>3.1 Unit Testing Methodology &amp; Test Cases</h3>
+<p>Testing is automated using <code>pytest</code>. The test suite validates feature integrity, data splits, preprocessor transformations, and API contracts.</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Test File</th>
+<th style="text-align: left;">Test Case Name</th>
+<th style="text-align: left;">Description</th>
+<th style="text-align: center;">Status</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><code>tests/test_features.py</code></td>
+<td style="text-align: left;"><code>test_synthetic_data_generation</code></td>
+<td style="text-align: left;">Validates column schemas and non-empty records.</td>
+<td style="text-align: center;"><strong>PASSED</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>tests/test_features.py</code></td>
+<td style="text-align: left;"><code>test_prepare_features_split</code></td>
+<td style="text-align: left;">Asserts correct train/test split ratios and stratifications.</td>
+<td style="text-align: center;"><strong>PASSED</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>tests/test_features.py</code></td>
+<td style="text-align: left;"><code>test_preprocessor_transformation</code></td>
+<td style="text-align: left;">Asserts output dimensionality of <code>ColumnTransformer</code>.</td>
+<td style="text-align: center;"><strong>PASSED</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>tests/test_api.py</code></td>
+<td style="text-align: left;"><code>test_root_endpoint</code></td>
+<td style="text-align: left;">Verifies root <code>/</code> JSON status and OpenAPI link.</td>
+<td style="text-align: center;"><strong>PASSED</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>tests/test_api.py</code></td>
+<td style="text-align: left;"><code>test_health_endpoint</code></td>
+<td style="text-align: left;">Asserts <code>/health</code> returns healthy and model loaded.</td>
+<td style="text-align: center;"><strong>PASSED</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><code>tests/test_api.py</code></td>
+<td style="text-align: left;"><code>test_predict_endpoint</code></td>
+<td style="text-align: left;">Validates inference schema, risk tier, and response.</td>
+<td style="text-align: center;"><strong>PASSED</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Summary</strong>: <strong>6 Passed, 0 Failed (100% Pass Rate)</strong> executed in 4.74 seconds.</p>
+<hr />
+<h3>3.2 Multi-Model Performance Benchmarking</h3>
+<p>Three candidate algorithms were evaluated on identical stratified test partitions (500 held-out student records):</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Model Architecture</th>
+<th style="text-align: center;">Accuracy</th>
+<th style="text-align: center;">Precision</th>
+<th style="text-align: center;">Recall</th>
+<th style="text-align: center;">F1-Score</th>
+<th style="text-align: center;">ROC-AUC</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>Logistic Regression (Baseline)</strong></td>
+<td style="text-align: center;">86.20%</td>
+<td style="text-align: center;">71.23%</td>
+<td style="text-align: center;">52.00%</td>
+<td style="text-align: center;">0.6012</td>
+<td style="text-align: center;"><strong>0.9044</strong></td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>Random Forest</strong></td>
+<td style="text-align: center;">85.20%</td>
+<td style="text-align: center;">72.41%</td>
+<td style="text-align: center;">42.00%</td>
+<td style="text-align: center;">0.5316</td>
+<td style="text-align: center;">0.8697</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>XGBoost (Production Selected)</strong></td>
+<td style="text-align: center;"><strong>86.60%</strong></td>
+<td style="text-align: center;"><strong>72.60%</strong></td>
+<td style="text-align: center;"><strong>53.00%</strong></td>
+<td style="text-align: center;"><strong>0.6127</strong></td>
+<td style="text-align: center;"><strong>0.8813</strong></td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Model Selection Justification</strong>:<br />
+<strong>XGBoost</strong> achieved the highest overall Accuracy (86.60%), Precision (72.60%), and F1-Score (0.6127). In educational early-warning systems, high precision is prioritized to prevent "alert fatigue" (falsely flagging on-time students).</li>
+</ul>
+<hr />
+<h3>3.3 Visualizations &amp; Evaluation Graphs</h3>
+<h4>1. ROC Curves Comparison</h4>
+<p><img alt="ROC Curve Comparison" src="figures/roc_curves.png" />
+* <em>Analysis</em>: Both XGBoost (AUC = 0.881) and Logistic Regression (AUC = 0.904) exhibit strong separability, significantly exceeding random chance across all operating thresholds.</p>
+<h4>2. Confusion Matrices</h4>
+<p><img alt="Confusion Matrices" src="figures/confusion_matrices.png" />
+* <em>Analysis</em>: Across the 500 test samples (400 on-time, 100 late), XGBoost accurately isolated 53 late submitters with only 20 false alarms, outperforming Random Forest which suffered higher false negatives.</p>
+<h4>3. Benchmark Metrics Comparison</h4>
+<p><img alt="Model Comparison Bar Chart" src="figures/model_comparison.png" /></p>
+<h4>4. XGBoost Feature Importance</h4>
+<p><img alt="Feature Importance" src="figures/feature_importance.png" />
+* <em>Key Finding</em>: The most influential predictors of delay are:
+  1. <code>hist_late_rate</code> &amp; <code>hist_avg_delay_days</code>: Historical habits are the strongest predictors of future lateness.
+  2. <code>clicks_last_7_days</code>: Disengagement directly precedes late submissions.
+  3. <code>concurrent_deadlines_window</code>: Scheduling density increases probability of delay.</p>
+<hr />
+<h3>3.4 Identified Issues &amp; Corrective Solutions Implemented</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">#</th>
+<th style="text-align: left;">Identified Issue / Bug</th>
+<th style="text-align: left;">Root Cause</th>
+<th style="text-align: left;">Implemented Solution</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;"><strong>1</strong></td>
+<td style="text-align: left;"><code>UntrustedTypesFoundException</code> during MLflow model logging.</td>
+<td style="text-align: left;">MLflow 3.x utilizes strict <code>skops</code> security audits rejecting XGBoost C-pointer types.</td>
+<td style="text-align: left;">Configured <code>serialization_format="pickle"</code> with automatic fallback to <code>mlflow.log_artifact()</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>2</strong></td>
+<td style="text-align: left;"><code>FastAPI TestClient</code> returned HTTP 503 during unit tests.</td>
+<td style="text-align: left;"><code>@app.on_event("startup")</code> was deprecated and not triggered by isolated test runners.</td>
+<td style="text-align: left;">Re-architected startup lifecycle using modern <code>lifespan</code> context manager and a lazy <code>get_predictor()</code> loader.</td>
+</tr>
+<tr>
+<td style="text-align: left;"><strong>3</strong></td>
+<td style="text-align: left;"><code>dvc add</code> failed with <code>bad DVC file name git-ignored</code>.</td>
+<td style="text-align: left;">Root <code>.gitignore</code> had blanket wildcard <code>/data/raw/*</code>.</td>
+<td style="text-align: left;">Added exceptions for <code>!*.dvc</code> and <code>!/data/**/.gitignore</code> to properly version control metadata.</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2>4. Progress Report &amp; Milestone Tracking</h2>
+<h3>4.1 Progress Against Phase 1–2 Proposal</h3>
+<ul>
+<li><strong>Architecture Implementation</strong>: 100% compliant with the Phase 1–2 proposed block diagram and process flow.</li>
+<li><strong>Technology Stack</strong>: All proposed tools (DVC, MLflow, FastAPI, Streamlit, Docker, Pytest, Evidently) are active.</li>
+<li><strong>Deviations</strong>: None. The system design was fully realized without scope reduction.</li>
+</ul>
+<h3>4.2 Completed vs. Pending Deliverables</h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: left;">Deliverable</th>
+<th style="text-align: center;">Target Phase</th>
+<th style="text-align: center;">Status</th>
+<th style="text-align: left;">Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: left;">Project Proposal &amp; System Design</td>
+<td style="text-align: center;">Phase 1–2</td>
+<td style="text-align: center;"><strong>Completed</strong></td>
+<td style="text-align: left;">Full document and HTML/PDF deliverable generated.</td>
+</tr>
+<tr>
+<td style="text-align: left;">GitHub Repository Setup</td>
+<td style="text-align: center;">Phase 1–2</td>
+<td style="text-align: center;"><strong>Completed</strong></td>
+<td style="text-align: left;">Continuous commit history on <code>main</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Feature Engineering &amp; DVC Tracking</td>
+<td style="text-align: center;">Phase 3–4</td>
+<td style="text-align: center;"><strong>Completed</strong></td>
+<td style="text-align: left;">Pipeline configured with <code>dvc.yaml</code>.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Model Training &amp; MLflow Tracking</td>
+<td style="text-align: center;">Phase 3–4</td>
+<td style="text-align: center;"><strong>Completed</strong></td>
+<td style="text-align: left;">XGBoost trained, logged, and registered.</td>
+</tr>
+<tr>
+<td style="text-align: left;">FastAPI REST Microservice</td>
+<td style="text-align: center;">Phase 3–4</td>
+<td style="text-align: center;"><strong>Completed</strong></td>
+<td style="text-align: left;">Live endpoints with Swagger UI.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Streamlit Interactive Dashboard</td>
+<td style="text-align: center;">Phase 3–4</td>
+<td style="text-align: center;"><strong>Completed</strong></td>
+<td style="text-align: left;">Instructor, Student, and Drift views operational.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Automated Unit Tests &amp; CI</td>
+<td style="text-align: center;">Phase 3–4</td>
+<td style="text-align: center;"><strong>Completed</strong></td>
+<td style="text-align: left;">Pytest (6/6 passing) + GitHub Actions workflow.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Physical Final Report (13 Sections)</td>
+<td style="text-align: center;">Phase 5</td>
+<td style="text-align: center;"><em>In Progress</em></td>
+<td style="text-align: left;">Drafting underway for final evaluation.</td>
+</tr>
+<tr>
+<td style="text-align: left;">Live Viva Voce &amp; Slide Deck</td>
+<td style="text-align: center;">Phase 5</td>
+<td style="text-align: center;"><em>Scheduled</em></td>
+<td style="text-align: left;">Presentation slides to be generated.</td>
+</tr>
+</tbody>
+</table>
+<h3>4.3 Individual Member Contribution Breakdown</h3>
+<ul>
+<li><strong>Team Member 1 (Data &amp; Feature Engineering)</strong>:</li>
+<li>Implemented <code>src/data/make_dataset.py</code> and configured DVC tracking.</li>
+<li>Formulated the feature extraction logic (<code>src/features/build_features.py</code>) and verified data splits.</li>
+<li><strong>Team Member 2 (ML &amp; MLOps Engineering)</strong>:</li>
+<li>Orchestrated multi-model benchmarking (<code>src/models/benchmark.py</code>) and MLflow tracking (<code>src/models/train_model.py</code>).</li>
+<li>Resolved serialization audits and implemented automated <code>pytest</code> test suites.</li>
+<li><strong>Team Member 3 (Deployment &amp; UI Engineering)</strong>:</li>
+<li>Engineered the FastAPI microservice (<code>api/main.py</code>) with Pydantic validation schemas.</li>
+<li>Developed the Streamlit multi-view frontend (<code>frontend/app.py</code>) and Docker container configurations.</li>
+</ul>
+</body>
+</html>
