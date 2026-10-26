@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  api:
+    build: .
+    container_name: delay_prediction_api
+    ports:
+      - "8000:8000"
+    command: uvicorn api.main:app --host 0.0.0.0 --port 8000 --reload
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+
+  frontend:
+    build: .
+    container_name: delay_prediction_ui
+    ports:
+      - "8501:8501"
+    command: streamlit run frontend/app.py --server.port 8501 --server.address 0.0.0.0
+    depends_on:
+      - api
+    volumes:
+      - ./models:/app/models
+      - ./data:/app/data
+
+  mlflow:
+    image: ghcr.io/mlflow/mlflow:latest
+    container_name: delay_prediction_mlflow
+    ports:
+      - "5000:5000"
+    command: mlflow server --backend-store-uri sqlite:///mlflow.db --default-artifact-root ./mlartifacts --host 0.0.0.0 --port 5000
+    volumes:
+      - ./mlruns:/mlflow/mlruns
+      - ./mlartifacts:/mlflow/mlartifacts

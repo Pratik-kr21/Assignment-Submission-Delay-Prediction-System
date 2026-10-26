@@ -1,0 +1,54 @@
+project:
+  name: "assignment-submission-delay-prediction"
+  version: "1.0.0"
+  description: "MLOps platform for predicting student assignment submission delays"
+
+data:
+  raw_dir: "data/raw"
+  processed_dir: "data/processed"
+  dataset_source: "Open University Learning Analytics Dataset (OULAD)"
+  test_size: 0.2
+  random_state: 42
+
+features:
+  observation_window_days: 3
+  historical_features:
+    - "hist_avg_delay_days"
+    - "hist_late_rate"
+    - "hist_max_delay_days"
+  engagement_features:
+    - "clicks_last_7_days"
+    - "clicks_last_14_days"
+    - "activity_decay_ratio"
+    - "days_to_first_vle_access"
+  workload_features:
+    - "concurrent_deadlines_window"
+    - "studied_credits"
+  assessment_features:
+    - "assessment_weight"
+    - "assessment_type"
+
+model:
+  target: "is_late"
+  algorithm: "xgboost"
+  params:
+    n_estimators: 200
+    learning_rate: 0.05
+    max_depth: 5
+    subsample: 0.8
+    colsample_bytree: 0.8
+    scale_pos_weight: 2.5
+    random_state: 42
+
+mlflow:
+  tracking_uri: "mlruns"
+  experiment_name: "Assignment_Submission_Delay_Prediction"
+  registered_model_name: "SubmissionDelayPredictor"
+
+api:
+  host: "0.0.0.0"
+  port: 8000
+  reload: true
+
+frontend:
+  port: 8501

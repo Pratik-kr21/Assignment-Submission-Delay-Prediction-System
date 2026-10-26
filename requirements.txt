@@ -1,0 +1,34 @@
+# Core Data Science & ML
+numpy>=1.24.0
+pandas>=2.0.0
+scipy>=1.10.0
+scikit-learn>=1.3.0
+xgboost>=2.0.0
+lightgbm>=4.1.0
+joblib>=1.3.0
+shap>=0.44.0
+
+# MLOps & Tracking
+mlflow>=2.10.0
+dvc>=3.40.0
+
+# API & Serving
+fastapi>=0.109.0
+uvicorn[standard]>=0.27.0
+pydantic>=2.6.0
+requests>=2.31.0
+
+# Interactive Dashboard / UI
+streamlit>=1.31.0
+
+# Monitoring & Quality
+evidently>=0.4.15
+
+# Testing & Linting
+pytest>=8.0.0
+black>=24.1.0
+flake8>=7.0.0
+
+# Configuration & Utilities
+pyyaml>=6.0.1
+python-dotenv>=1.0.1
