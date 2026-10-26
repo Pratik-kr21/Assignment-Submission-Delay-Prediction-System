@@ -91,8 +91,8 @@ An end-to-end Machine Learning Operations (MLOps) platform that forecasts studen
 ### 2. Environment Setup
 ```bash
 # Clone the repository
-git clone <your-github-repo-url>
-cd "CLass Project"
+git clone https://github.com/Pratik-kr21/Assignment-Submission-Delay-Prediction-System.git
+cd Assignment-Submission-Delay-Prediction-System
 
 # Create and activate virtual environment
 python -m venv venv
