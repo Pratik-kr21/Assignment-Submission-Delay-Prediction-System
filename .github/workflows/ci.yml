@@ -1,39 +1,62 @@
-name: Continuous Integration (CI)
+name: MLOps Continuous Integration (CI)
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "main", "master" ]
+  workflow_dispatch:
 
 jobs:
-  test:
+  build-and-test:
+    name: Build, Lint & Test (Python ${{ matrix.python-version }})
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
-        python-version: ["3.11"]
+        python-version: ["3.10", "3.11"]
 
     steps:
-    - name: Checkout Repository
-      uses: actions/checkout@v4
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python ${{ matrix.python-version }}
-      uses: actions/setup-python@v5
-      with:
-        python-version: ${{ matrix.python-version }}
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+          cache: "pip"
 
-    - name: Install Dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          pip install flake8
 
-    - name: Lint with Flake8
-      run: |
-        # stop the build if there are Python syntax errors or undefined names
-        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=venv
-        # exit-zero treats all errors as warnings
-        flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=venv
+      - name: Lint Code with Flake8
+        run: |
+          # Stop the build if there are Python syntax errors or undefined names
+          flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics --exclude=venv,.venv
+          # Treat formatting warnings with exit-zero so style suggestions do not fail CI
+          flake8 . --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics --exclude=venv,.venv
 
-    - name: Run Unit Tests with Pytest
-      run: |
-        pytest -v
+      - name: Validate ML Training Pipeline
+        run: |
+          python train.py
+
+      - name: Run Automated Test Suite
+        run: |
+          pytest -v
+
+      - name: Smoke Test Application Services
+        run: |
+          python -c "import main, app, train; print('All core modules imported successfully.')"
+
+      - name: Upload Trained Model Artifact
+        if: matrix.python-version == '3.11'
+        uses: actions/upload-artifact@v4
+        with:
+          name: trained-model-joblib
+          path: model.joblib
+          if-no-files-found: error
+          retention-days: 14
+

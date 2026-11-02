@@ -1,1 +1,0 @@
-"""FastAPI microservice package."""
